@@ -141,7 +141,7 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-               
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -152,6 +152,12 @@ class MainActivity : ComponentActivity() {
                             scope.launch {
                                 if (descripcion.isBlank() || diasCompromiso.isBlank()) {
                                     mensajeError = "Debe de Completar Todos los Campos."
+                                    return@launch
+                                }
+
+                                val diasCompromisoValor = diasCompromiso.toIntOrNull()
+                                if (diasCompromisoValor == null || diasCompromisoValor <= 0){
+                                    mensajeError = "Días de Compromiso debe ser un numero mayor que 0."
                                     return@launch
                                 }
 
@@ -219,7 +225,7 @@ class MainActivity : ComponentActivity() {
         ) {
 
             Text(
-                text = "Lista Prioridades",
+                text = "Lista De Prioridades",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
