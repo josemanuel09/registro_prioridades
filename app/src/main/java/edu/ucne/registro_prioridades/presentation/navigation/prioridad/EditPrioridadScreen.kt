@@ -27,7 +27,7 @@ fun EditPrioridadScreen(
     var mensajeError by remember { mutableStateOf("") }
     var mensajeExito by remember { mutableStateOf("") }
 
-    // Cargar la prioridad a editar
+
     LaunchedEffect(prioridadId) {
         val loadedPrioridad = prioridadDb.prioridadDao().find(prioridadId)
         prioridad = loadedPrioridad

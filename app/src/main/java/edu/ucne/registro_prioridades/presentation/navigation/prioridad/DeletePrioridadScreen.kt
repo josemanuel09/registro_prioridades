@@ -42,7 +42,7 @@ fun DeletePrioridadScreen(
     val prioridad = remember { mutableStateOf<PrioridadEntity?>(null) }
     val isLoading = remember { mutableStateOf(true) }
 
-    // Cargar la prioridad a eliminar
+
     LaunchedEffect(prioridadId) {
         val p = prioridadDb.prioridadDao().find(prioridadId)
         prioridad.value = p
