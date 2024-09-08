@@ -17,7 +17,8 @@ interface PrioridadDao {
     suspend fun find(id: Int): PrioridadEntity?
 
     @Delete
-    suspend fun delete(prioridad: PrioridadEntity)
+    suspend fun delete (prioridad: PrioridadEntity)
+
 
     @Query("SELECT * FROM Prioridades")
     fun getAll(): Flow<List<PrioridadEntity>>
