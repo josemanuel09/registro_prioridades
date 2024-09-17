@@ -1,4 +1,4 @@
-package  edu.ucne.registro_prioridades.local.entities
+package  edu.ucne.registro_prioridades.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
