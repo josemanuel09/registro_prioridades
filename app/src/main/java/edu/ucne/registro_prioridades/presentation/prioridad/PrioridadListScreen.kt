@@ -1,4 +1,6 @@
-package edu.ucne.registro_prioridades.presentation.navigation.prioridad
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package edu.ucne.registro_prioridades.presentation.prioridad
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -6,9 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,19 +20,68 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.ucne.registro_prioridades.local.entities.PrioridadEntity
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import edu.ucne.registro_prioridades.data.local.entities.PrioridadEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun PrioridadListScreen(
-    prioridadList: List<PrioridadEntity>,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    viewModel: PrioridadViewModel = hiltViewModel(),
     createPrioridad: () -> Unit,
-    editPrioridad: (PrioridadEntity) -> Unit,
-    deletePrioridad: (PrioridadEntity) -> Unit
+    onEditPrioridad: (Int) -> Unit,
+    onDeletePrioridad: (Int) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    PrioridadListBodyScreen(
+        drawerState = drawerState,
+        scope = scope,
+        uiState = uiState,
+        createPrioridad = createPrioridad,
+        onEditPrioridad = onEditPrioridad,
+        onDeletePrioridad = onDeletePrioridad
+    )
+}
+
+@Composable
+fun PrioridadListBodyScreen(
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    uiState: PrioridadViewModel.UiState,
+    createPrioridad: () -> Unit,
+    onEditPrioridad: (Int) -> Unit,
+    onDeletePrioridad: (Int) -> Unit
 ) {
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Lista de Prioridades",
+                        style = TextStyle(
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        scope.launch { drawerState.open() }
+                    }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Ir al menú")
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF6200EE)
+                )
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = createPrioridad,
@@ -39,46 +91,32 @@ fun PrioridadListScreen(
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Añadir Prioridad")
             }
-        },
-        content = { paddingValues ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
+        }
+    ) { paddingValues ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Lista Prioridades",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    style = TextStyle(
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
-                    )
-                )
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(prioridadList) { prioridad ->
-                        PrioridadRow(prioridad, editPrioridad, deletePrioridad)
-                    }
+                items(uiState.prioridades) { prioridad ->
+                    PrioridadRow(prioridad, onEditPrioridad, onDeletePrioridad)
                 }
             }
         }
-    )
+    }
 }
 
 @Composable
 fun PrioridadRow(
     prioridad: PrioridadEntity,
-    editPrioridad: (PrioridadEntity) -> Unit,
-    deletePrioridad: (PrioridadEntity) -> Unit
+    onEditPrioridad: (Int) -> Unit,
+    onDeletePrioridad: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -128,23 +166,22 @@ fun PrioridadRow(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-                offset = DpOffset(x = (220).dp, y = 0.dp)
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
             ) {
                 DropdownMenuItem(
                     text = { Text("Editar") },
                     leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
                     onClick = {
-                        editPrioridad(prioridad)
                         expanded = false
+                        onEditPrioridad(prioridad.prioridadId!!)
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("Eliminar") },
                     leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
                     onClick = {
-                        deletePrioridad(prioridad)
                         expanded = false
+                        onDeletePrioridad(prioridad.prioridadId!!)
                     }
                 )
             }
