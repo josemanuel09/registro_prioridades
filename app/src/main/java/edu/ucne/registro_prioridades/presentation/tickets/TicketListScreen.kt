@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.ucne.registro_prioridades.data.local.entities.TicketEntity
+import edu.ucne.registro_prioridades.data.remote.dto.TicketDto
+import edu.ucne.registro_prioridades.presentation.tickets.TicketViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -115,7 +117,7 @@ fun TicketListBodyScreen(
 
 @Composable
 fun TicketRow(
-    ticket: TicketEntity,
+    ticket: TicketDto,
     onEditTicket: (Int) -> Unit,
     onDeleteTicket: (Int) -> Unit
 ) {
@@ -149,7 +151,7 @@ fun TicketRow(
                     )
                 )
                 Text(
-                    text = "Cliente: ${ticket.cliente}",
+                    text = "Cliente: ${ticket.clienteId}",
                     style = TextStyle(
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
