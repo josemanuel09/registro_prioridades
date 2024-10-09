@@ -58,7 +58,7 @@ class SistemasViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         sistemaId = sistemas?.sistemaId,
-                        NombreSistema = sistemas?.NombreSistema ?: ""
+                        NombreSistema = sistemas?.nombreSistema ?: ""
                     )
                 }
             }
@@ -92,13 +92,10 @@ class SistemasViewModel @Inject constructor(
         val sistemas: List<SistemasDto> = emptyList()
     )
 
-    fun Uistate.toEntity(): SistemasDto {
-        if (NombreSistema.isBlank()) {
-            throw IllegalArgumentException("El campo 'NombreSistema' no puede estar vacío")
-        }
-        return SistemasDto(
-            sistemaId = sistemaId ?: throw IllegalArgumentException("El campo 'sistemaId' no puede ser nulo"),
-            NombreSistema = NombreSistema
-        )
-    }
+    fun Uistate.toEntity() = SistemasDto (
+        sistemaId = sistemaId,
+        nombreSistema = NombreSistema
+    )
+
+
 }
