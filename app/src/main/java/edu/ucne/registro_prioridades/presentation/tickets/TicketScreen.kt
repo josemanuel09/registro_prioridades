@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import edu.ucne.registro_prioridades.presentation.tickets.TicketViewModel
 
 @Composable
 fun TicketScreen(viewModel: TicketViewModel = hiltViewModel(), goBack: () -> Unit) {
@@ -38,7 +39,7 @@ fun TicketScreen(viewModel: TicketViewModel = hiltViewModel(), goBack: () -> Uni
     TicketBodyScreen(
         uiState = uiState.value,
         onFechaChange = viewModel::onFechaChange,
-        onPrioridadChange = viewModel::onPrioridadIdChange,
+        onPrioridadChange = viewModel::onPrioridadChange,
         onClienteChange = viewModel::onClienteChange,
         onAsuntoChange = viewModel::onAsuntoChange,
         onDescripcionChange = viewModel::onDescripcionChange,
@@ -53,8 +54,8 @@ fun TicketScreen(viewModel: TicketViewModel = hiltViewModel(), goBack: () -> Uni
 fun TicketBodyScreen(
     uiState: TicketViewModel.UiState,
     onFechaChange: (String) ->Unit,
-    onPrioridadChange: (Int?) -> Unit,
-    onClienteChange: (String) -> Unit,
+    onPrioridadChange: (Int) -> Unit,
+    onClienteChange: (Int) -> Unit,
     onAsuntoChange: (String) -> Unit,
     onDescripcionChange: (String) -> Unit,
     save: () -> Unit,
@@ -113,7 +114,7 @@ fun TicketBodyScreen(
                     prioridades.forEach { prioridad ->
                         DropdownMenuItem(
                             text = { Text(prioridad.descripcion) },onClick = {
-                                onPrioridadChange(prioridad.prioridadId)
+                                onPrioridadChange(prioridad.prioridadId ?: 0)
                                 selectedPrioridadText = prioridad.descripcion
                                 expanded = false
                             }
@@ -129,14 +130,6 @@ fun TicketBodyScreen(
                 label = { Text(text = "Fecha") },
                 value = uiState.fecha,
                 onValueChange = onFechaChange
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = "Cliente") },
-                value = uiState.cliente,
-                onValueChange = onClienteChange
             )
             Spacer(modifier = Modifier.height(12.dp))
 

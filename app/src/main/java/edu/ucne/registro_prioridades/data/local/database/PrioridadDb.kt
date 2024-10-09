@@ -14,7 +14,7 @@ import edu.ucne.registro_prioridades.data.local.entities.TicketEntity
         TicketEntity::class
     ],
 
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class PrioridadDb : RoomDatabase() {

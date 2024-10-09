@@ -1,9 +1,14 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
-package edu.ucne.registro_prioridades.presentation.ticket
+package edu.ucne.registro_prioridades.presentation.clientes
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -12,60 +17,76 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import edu.ucne.registro_prioridades.data.local.entities.TicketEntity
-import edu.ucne.registro_prioridades.data.remote.dto.TicketDto
-import edu.ucne.registro_prioridades.presentation.tickets.TicketViewModel
+import edu.ucne.prioridadregistro.presentation.clientes.ClientesViewModel
+import edu.ucne.registro_prioridades.data.remote.dto.ClienteDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun TicketListScreen(
+fun ClientesListScreen(
     drawerState: DrawerState,
     scope: CoroutineScope,
-    viewModel: TicketViewModel = hiltViewModel(),
-    createTicket: () -> Unit,
-    onEditTicket: (Int) -> Unit,
-    onDeleteTicket: (Int) -> Unit
+    viewModel: ClientesViewModel = hiltViewModel(),
+    createCliente: () -> Unit,
+    onEditCliente: (Int) -> Unit,
+    onDeleteCliente: (Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TicketListBodyScreen(
+    ClientesListBodyScreen(
         drawerState = drawerState,
         scope = scope,
         uiState = uiState,
-        createTicket = createTicket,
-        onEditTicket = onEditTicket,
-        onDeleteTicket = onDeleteTicket
+        createCliente = createCliente,
+        onEditCliente = onEditCliente,
+        onDeleteCliente = onDeleteCliente
     )
 }
 
 @Composable
-fun TicketListBodyScreen(
+fun ClientesListBodyScreen(
     drawerState: DrawerState,
     scope: CoroutineScope,
-    uiState: TicketViewModel.UiState,
-    createTicket: () -> Unit,
-    onEditTicket: (Int) -> Unit,
-    onDeleteTicket: (Int) -> Unit
-) {
+    uiState: ClientesViewModel.UiState,
+    createCliente: () -> Unit,
+    onEditCliente: (Int) -> Unit,
+    onDeleteCliente: (Int) -> Unit
+)
+ {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Lista de Tickets",
+                        text = "Lista de Clientes",
                         style = TextStyle(
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
@@ -87,12 +108,12 @@ fun TicketListBodyScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = createTicket,
+                onClick = createCliente,
                 modifier = Modifier.padding(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Añadir Ticket")
+                Icon(Icons.Filled.Add, contentDescription = "Añadir Cliente")
             }
         }
     ) { paddingValues ->
@@ -107,8 +128,8 @@ fun TicketListBodyScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.tickets) { ticket ->
-                    TicketRow(ticket, onEditTicket, onDeleteTicket)
+                items(uiState.clientes) { cliente ->
+                    ClienteRow(cliente, onEditCliente, onDeleteCliente)
                 }
             }
         }
@@ -116,10 +137,10 @@ fun TicketListBodyScreen(
 }
 
 @Composable
-fun TicketRow(
-    ticket: TicketDto,
-    onEditTicket: (Int) -> Unit,
-    onDeleteTicket: (Int) -> Unit
+fun ClienteRow(
+    cliente: ClienteDto,
+    onEditCliente: (Int) -> Unit,
+    onDeleteCliente: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -143,27 +164,14 @@ fun TicketRow(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "TicketId: ${ticket.ticketId}",
+                    text = cliente.nombres, // Asegúrate de que este DTO tenga la propiedad nombres
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
-                Text(
-                    text = "Cliente: ${ticket.clienteId}",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
-                Text(
-                    text = "Asunto: ${ticket.asunto}",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
+                // Puedes agregar más información del cliente aquí, si es necesario
             }
 
             IconButton(
@@ -183,7 +191,9 @@ fun TicketRow(
                     leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
                     onClick = {
                         expanded = false
-                        onEditTicket(ticket.ticketId!!)
+                        cliente.clienteId?.let { id -> // Maneja el caso donde clienteId puede ser nulo
+                            onEditCliente(id)
+                        }
                     }
                 )
                 DropdownMenuItem(
@@ -191,7 +201,9 @@ fun TicketRow(
                     leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
                     onClick = {
                         expanded = false
-                        onDeleteTicket(ticket.ticketId!!)
+                        cliente.clienteId?.let { id -> // Maneja el caso donde clienteId puede ser nulo
+                            onDeleteCliente(id)
+                        }
                     }
                 )
             }

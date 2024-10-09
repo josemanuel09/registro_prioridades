@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.ucne.registro_prioridades.data.local.entities.PrioridadEntity
+import edu.ucne.registro_prioridades.data.remote.dto.PrioridadDto
 import edu.ucne.registro_prioridades.data.repository.PrioridadRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -96,7 +97,7 @@ class PrioridadViewModel @Inject constructor(
                         errorMessages = null
                     )
                 }
-                nuevo() // Limpiar el estado después de eliminar
+                nuevo()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(errorMessages = "Error al eliminar la prioridad", successMessage = null)
@@ -107,13 +108,18 @@ class PrioridadViewModel @Inject constructor(
 
     fun getPrioridades() {
         viewModelScope.launch {
-            prioridadRepository.getPrioridades().collect { prioridades ->
-                _uiState.update {
-                    it.copy(prioridades = prioridades)
+            try {
+                val prioridades = prioridadRepository.getAll()
+                if (prioridades.isEmpty()) {
+                    throw EmptyListException("La lista de prioridades está vacía")
                 }
+                _uiState.update { it.copy(prioridades = prioridades) }
+            } catch (e: EmptyListException) {
+                _uiState.update { it.copy(errorMessages = e.message, successMessage = null) }
             }
         }
     }
+    class EmptyListException(message: String) : Exception(message)
 
     fun onDescripcionChange(descripcion: String) {
         _uiState.update {
@@ -133,10 +139,10 @@ class PrioridadViewModel @Inject constructor(
         val diasCompromiso: Int = 0,
         val errorMessages: String? = null,
         val successMessage: String? = null,
-        val prioridades: List<PrioridadEntity> = emptyList()
+        val prioridades: List<PrioridadDto> = emptyList()
     )
 
-    fun UiState.toEntity() = PrioridadEntity(
+    fun UiState.toEntity() = PrioridadDto(
         prioridadId = prioridadId,
         descripcion = descripcion,
         diasCompromiso = diasCompromiso

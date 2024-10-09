@@ -61,6 +61,7 @@ dependencies {
 
     //room
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation(libs.androidx.benchmark.common)
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 

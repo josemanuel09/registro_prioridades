@@ -48,6 +48,16 @@ fun NavigationItems() : List<NavigationItem> {
             title = "Tickets",
             selectedIcon = Icons.Filled.Info,
             unselectedIcon = Icons.Outlined.Build,
+        ),
+        NavigationItem(
+            title = "Sistemas",
+            selectedIcon = Icons.Filled.Info,
+            unselectedIcon = Icons.Outlined.Build,
+        ),
+        NavigationItem(
+            title = "Clientes",
+            selectedIcon = Icons.Filled.Info,
+            unselectedIcon = Icons.Outlined.Build,
         )
     )
 }
