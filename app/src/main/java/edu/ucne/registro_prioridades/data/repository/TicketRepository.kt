@@ -2,16 +2,18 @@ package edu.ucne.registro_prioridades.data.repository
 
 import edu.ucne.registro_prioridades.data.local.dao.TicketDao
 import edu.ucne.registro_prioridades.data.local.entities.TicketEntity
+import edu.ucne.registro_prioridades.data.remote.TicketApi
+import edu.ucne.registro_prioridades.data.remote.dto.TicketDto
 import javax.inject.Inject
 
 class TicketRepository @Inject constructor(
-    private val ticketDao: TicketDao
+    private val ticketApi: TicketApi
 ) {
-    suspend fun save(ticket: TicketEntity) = ticketDao.Save(ticket)
+    suspend fun save(ticket: TicketDto) = ticketApi.save(ticket)
 
-    suspend fun getTicket(id: Int) = ticketDao.find(id)
+    suspend fun getTicket(id: Int) = ticketApi.getTicket(id)
 
-    suspend fun delete(ticket: TicketEntity) = ticketDao.delete(ticket)
+    suspend fun delete(id: Int) = ticketApi.delete(id)
 
-    fun getTickets() = ticketDao.getAll()
+   suspend fun getTickets() = ticketApi.getAll()
 }
