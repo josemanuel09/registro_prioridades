@@ -139,52 +139,51 @@ fun SistemaRow(
             ) {
                 Text(
 
-                    text = "NombreSistema: ${sistema.NombreSistema}",
+                    text = "NombreSistema: ${sistema.nombreSistema}",
                     style = TextStyle(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
-                    Text(
-                        text = "ID: ${sistema.sistemaId}",
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
+                Text(
+                    text = "ID: ${sistema.sistemaId}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
-                }
-            }
-
-            IconButton(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones")
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Editar") },
-                    leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
-                    onClick = {
-                        expanded = false
-                        onEditSistema(sistema.sistemaId ?: 0)
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Eliminar") },
-                    leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
-                    onClick = {
-                        expanded = false
-                        onDeleteSistema(sistema.sistemaId ?: 0)
-                    }
                 )
             }
         }
-    }
 
+        IconButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier.weight(1f)
+        ) {
+            Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones")
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        ) {
+            DropdownMenuItem(
+                text = { Text("Editar") },
+                leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
+                onClick = {
+                    expanded = false
+                    onEditSistema(sistema.sistemaId ?: 0)
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Eliminar") },
+                leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
+                onClick = {
+                    expanded = false
+                    onDeleteSistema(sistema.sistemaId ?: 0)
+                }
+            )
+        }
+    }
+}
