@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,27 +38,29 @@ class TicketViewModel @Inject constructor(
 
     fun saveTicket() {
         viewModelScope.launch {
-            if (_uiState.value.clienteId == null || _uiState.value.asunto.isBlank() || _uiState.value.prioridadId == null || _uiState.value.fecha.isBlank()) {
+            if ( _uiState.value.sistemaId == null ||_uiState.value.clienteId == null || _uiState.value.asunto.isBlank() ||_uiState.value.solicitadoPor.isBlank()|| _uiState.value.descripcion.isBlank() || _uiState.value.prioridadId == null || _uiState.value.sistemaId == null || _uiState.value.fecha == null) {
                 _uiState.update { it.copy(errorMessage = "Todos los campos son obligatorios.") }
                 return@launch
             }
 
             try {
                 ticketRepository.save(_uiState.value.toEntity())
-                nuevoTicket()
+                nuevo()
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = "Error al guardar el ticket: ${e.message}") }
             }
         }
     }
 
-    fun nuevoTicket() {
+    fun nuevo() {
         _uiState.update {
             it.copy(
                 ticketId = 0,
-                fecha = "",
+                fecha = Date(),
                 prioridadId = null,
                 clienteId = null,
+                sistemaId = null,
+                solicitadoPor = "",
                 asunto = "",
                 descripcion = "",
                 errorMessage = null
@@ -76,6 +79,8 @@ class TicketViewModel @Inject constructor(
                             fecha = ticket.fecha,
                             prioridadId = ticket.prioridadId,
                             clienteId = ticket.clienteId,
+                            solicitadoPor = ticket.solicitadoPor,
+                            sistemaId = ticket.sistemaId,
                             asunto = ticket.asunto,
                             descripcion = ticket.descripcion
                         )
@@ -96,7 +101,7 @@ class TicketViewModel @Inject constructor(
     fun delete() {
         viewModelScope.launch {
             ticketRepository.delete(_uiState.value.ticketId!!)
-            nuevoTicket()
+            nuevo()
         }
     }
     fun onDescripcionChange(descripcion: String){
@@ -109,7 +114,12 @@ class TicketViewModel @Inject constructor(
             it.copy(prioridadId = prioridadId)
         }
     }
-    fun onFechaChange(fecha: String){
+    fun onSistemaChange(sistemaId: Int){
+        _uiState.update {
+            it.copy(sistemaId = sistemaId)
+        }
+    }
+    fun onFechaChange(fecha: Date){
         _uiState.update {
             it.copy(fecha = fecha)
         }
@@ -120,11 +130,7 @@ class TicketViewModel @Inject constructor(
         }
     }
 
-    fun onSistemaChange(sistemaId: Int){
-        _uiState.update {
-            it.copy(sistemaId = sistemaId)
-        }
-    }
+
 
 
     private fun getTickets() {
@@ -169,7 +175,7 @@ class TicketViewModel @Inject constructor(
 
     data class UiState(
         val ticketId: Int = 0,
-        val fecha: String = "",
+        val fecha: Date = Date(),
         val prioridadId: Int? = null,
         val clienteId: Int? = null,
         val sistemaId: Int? = null,
