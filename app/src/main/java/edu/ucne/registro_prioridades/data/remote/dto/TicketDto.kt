@@ -1,8 +1,10 @@
 package edu.ucne.registro_prioridades.data.remote.dto
 
+import java.util.Date
+
 data class TicketDto(
     val ticketId: Int,
-    val fecha: String,
+    val fecha: Date,
     val clienteId: Int,
     val sistemaId: Int,
     val prioridadId: Int,
