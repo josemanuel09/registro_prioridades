@@ -13,16 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -57,8 +52,7 @@ fun ClientesListScreen(
     scope: CoroutineScope,
     viewModel: ClientesViewModel = hiltViewModel(),
     createCliente: () -> Unit,
-    onEditCliente: (Int) -> Unit,
-    onDeleteCliente: (Int) -> Unit
+
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     ClientesListBodyScreen(
@@ -66,8 +60,7 @@ fun ClientesListScreen(
         scope = scope,
         uiState = uiState,
         createCliente = createCliente,
-        onEditCliente = onEditCliente,
-        onDeleteCliente = onDeleteCliente
+
     )
 }
 
@@ -77,8 +70,7 @@ fun ClientesListBodyScreen(
     scope: CoroutineScope,
     uiState: ClientesViewModel.UiState,
     createCliente: () -> Unit,
-    onEditCliente: (Int) -> Unit,
-    onDeleteCliente: (Int) -> Unit
+
 )
  {
     Scaffold(
@@ -129,7 +121,7 @@ fun ClientesListBodyScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(uiState.clientes) { cliente ->
-                    ClienteRow(cliente, onEditCliente, onDeleteCliente)
+                    ClienteRow(cliente)
                 }
             }
         }
@@ -139,8 +131,7 @@ fun ClientesListBodyScreen(
 @Composable
 fun ClienteRow(
     cliente: ClienteDto,
-    onEditCliente: (Int) -> Unit,
-    onDeleteCliente: (Int) -> Unit
+
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -164,47 +155,47 @@ fun ClienteRow(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = cliente.nombres, // Asegúrate de que este DTO tenga la propiedad nombres
+                    text = cliente.nombres,
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
-                // Puedes agregar más información del cliente aquí, si es necesario
-            }
-
-            IconButton(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones")
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Editar") },
-                    leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
-                    onClick = {
-                        expanded = false
-                        cliente.clienteId?.let { id -> // Maneja el caso donde clienteId puede ser nulo
-                            onEditCliente(id)
-                        }
-                    }
+                Text(
+                    text ="Telefono: ${ cliente.telefono }",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
                 )
-                DropdownMenuItem(
-                    text = { Text("Eliminar") },
-                    leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
-                    onClick = {
-                        expanded = false
-                        cliente.clienteId?.let { id -> // Maneja el caso donde clienteId puede ser nulo
-                            onDeleteCliente(id)
-                        }
-                    }
+                Text(
+                    text ="Celular: ${ cliente.celular }",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Text(
+                    text ="RNC: ${ cliente.rnc }",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Text(
+                    text ="Email: ${ cliente.email }",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Text(
+                    text ="Direccion: ${ cliente.direccion }",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
                 )
             }
         }
