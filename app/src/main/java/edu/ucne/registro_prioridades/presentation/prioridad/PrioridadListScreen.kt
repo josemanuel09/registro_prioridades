@@ -35,8 +35,6 @@ fun PrioridadListScreen(
     scope: CoroutineScope,
     viewModel: PrioridadViewModel = hiltViewModel(),
     createPrioridad: () -> Unit,
-    onEditPrioridad: (Int) -> Unit,
-    onDeletePrioridad: (Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     PrioridadListBodyScreen(
@@ -44,8 +42,6 @@ fun PrioridadListScreen(
         scope = scope,
         uiState = uiState,
         createPrioridad = createPrioridad,
-        onEditPrioridad = onEditPrioridad,
-        onDeletePrioridad = onDeletePrioridad
     )
 }
 
@@ -55,8 +51,7 @@ fun PrioridadListBodyScreen(
     scope: CoroutineScope,
     uiState: PrioridadViewModel.UiState,
     createPrioridad: () -> Unit,
-    onEditPrioridad: (Int) -> Unit,
-    onDeletePrioridad: (Int) -> Unit
+
 ) {
     Scaffold(
         topBar = {
@@ -106,7 +101,7 @@ fun PrioridadListBodyScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(uiState.prioridades) { prioridad ->
-                    PrioridadRow(prioridad, onEditPrioridad, onDeletePrioridad)
+                    PrioridadRow(prioridad)
                 }
             }
         }
@@ -116,8 +111,7 @@ fun PrioridadListBodyScreen(
 @Composable
 fun PrioridadRow(
     prioridad: PrioridadDto,
-    onEditPrioridad: (Int) -> Unit,
-    onDeletePrioridad: (Int) -> Unit
+
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -154,36 +148,6 @@ fun PrioridadRow(
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
-                )
-            }
-
-            IconButton(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones")
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Editar") },
-                    leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
-                    onClick = {
-                        expanded = false
-                        onEditPrioridad(prioridad.prioridadId!!)
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Eliminar") },
-                    leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
-                    onClick = {
-                        expanded = false
-                        onDeletePrioridad(prioridad.prioridadId!!)
-                    }
                 )
             }
         }

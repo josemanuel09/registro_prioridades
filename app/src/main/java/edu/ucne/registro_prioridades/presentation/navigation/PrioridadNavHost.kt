@@ -42,8 +42,7 @@ import androidx.navigation.toRoute
 import edu.ucne.prioridadregistro.presentation.clientes.ClientesScreen
 import edu.ucne.registro_prioridades.NavigationItem
 import edu.ucne.registro_prioridades.presentation.clientes.ClientesListScreen
-import edu.ucne.registro_prioridades.presentation.prioridad.DeletePrioridadScreen
-import edu.ucne.registro_prioridades.presentation.prioridad.EditPrioridadScreen
+
 import edu.ucne.registro_prioridades.presentation.prioridad.PrioridadListScreen
 import edu.ucne.registro_prioridades.presentation.prioridad.PrioridadScreen
 import edu.ucne.registro_prioridades.presentation.sistemas.SistemaListScreen
@@ -116,12 +115,7 @@ fun registro_prioridadesNavHost(
                     createPrioridad = {
                         navHostController.navigate(ScreenPrioridades.Prioridades(0))
                     },
-                    onEditPrioridad = { prioridad ->
-                        navHostController.navigate(ScreenPrioridades.EditPrioridad(prioridad))
-                    },
-                    onDeletePrioridad = { prioridad ->
-                        navHostController.navigate(ScreenPrioridades.DeletePrioridad(prioridad))
-                    }
+
                 )
             }
             composable<ScreenPrioridades.TicketsList> {
@@ -130,12 +124,6 @@ fun registro_prioridadesNavHost(
                     scope = scope,
                     createTicket = {
                         navHostController.navigate(ScreenPrioridades.Tickets(0))
-                    },
-                    onEditTicket = { ticket ->
-                        navHostController.navigate(ScreenPrioridades.EditTicket(ticket))
-                    },
-                    onDeleteTicket = { ticket ->
-                        navHostController.navigate(ScreenPrioridades.DeleteTicket(ticket))
                     }
                 )
             }
@@ -162,13 +150,8 @@ fun registro_prioridadesNavHost(
                     scope = scope,
                     createCliente = {
                         navHostController.navigate(ScreenPrioridades.Clientes(0))
-                    },
-                    onEditCliente = { cliente ->
-                        navHostController.navigate(ScreenPrioridades.EditCliente(cliente))
-                    },
-                    onDeleteCliente = { cliente ->
-                        navHostController.navigate(ScreenPrioridades.DeleteCliente(cliente))
                     }
+
                 )
 
             }
@@ -206,31 +189,6 @@ fun registro_prioridadesNavHost(
                     }
                 )
             }
-            composable<ScreenPrioridades.EditPrioridad> {
-                val args = it.toRoute<ScreenPrioridades.EditPrioridad>()
-                EditPrioridadScreen(
-                    prioridadId = args.prioridadId,
-                    goBack = {
-                        navHostController.navigateUp()
-                    }
-                )
-            }
-
-
-
-            composable<ScreenPrioridades.DeletePrioridad> {
-                val args = it.toRoute<ScreenPrioridades.DeletePrioridad>()
-                DeletePrioridadScreen(
-                    prioridadId = args.prioridadId,
-                    goBack = {
-                        navHostController.navigateUp()
-                    }
-                )
-            }
-
-
-
-
 
         }
     }
