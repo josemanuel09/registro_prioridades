@@ -19,38 +19,58 @@ class ClientesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState get() = _uiState.asStateFlow()
 
-    init {
+    init{
         getClientes()
     }
-
     fun save() {
         viewModelScope.launch {
             val state = _uiState.value
-            when {
-                state.nombres.isBlank() -> {
+            var hasError = false
+
+            if (state.nombres.isBlank()) {
+                _uiState.update { it.copy(nombresError = "El nombre no puede estar vacío") }
+                hasError = true
+            }
+            if (state.telefono.isBlank()) {
+                _uiState.update { it.copy(telefonoError = "El teléfono no puede estar vacío") }
+                hasError = true
+            }
+
+            if (state.celular.isBlank()) {
+                _uiState.update { it.copy(celularError = "El celular no puede estar vacío") }
+                hasError = true
+            }
+            if (state.rnc.isBlank()) {
+                _uiState.update { it.copy(rncError = "El RNC no puede estar vacío") }
+                hasError = true
+            }
+            if (state.email.isBlank()) {
+                _uiState.update { it.copy(emailError = "El email no puede estar vacío") }
+                hasError = true
+            }
+            if (state.direccion.isBlank()) {
+                _uiState.update { it.copy(direccionError = "La dirección no puede estar vacía") }
+                hasError = true
+            }
+
+            if (!hasError) {
+                try {
+                    clienteRepository.saveCliente(state.toEntity())
                     _uiState.update {
-                        it.copy(errorMessage = "El nombre no puede estar vacío", successMessage = null)
+                        it.copy(
+                            successMessage = "Cliente guardado exitosamente",
+                            nombresError = null,
+                            telefonoError = null,
+                            celularError = null,
+                            rncError = null,
+                            emailError = null,
+                            direccionError = null
+                        )
                     }
-                }
-                state.telefono.isBlank() -> {
+                    nuevo()
+                } catch (e: Exception) {
                     _uiState.update {
-                        it.copy(errorMessage = "El teléfono no puede estar vacío", successMessage = null)
-                    }
-                }
-                else -> {
-                    try {
-                        clienteRepository.saveCliente(state.toEntity())
-                        _uiState.update {
-                            it.copy(
-                                successMessage = "Cliente guardado exitosamente",
-                                errorMessage = null
-                            )
-                        }
-                        nuevo()
-                    } catch (e: Exception) {
-                        _uiState.update {
-                            it.copy(errorMessage = "Error al guardar el cliente", successMessage = null)
-                        }
+                        it.copy(errorMessage = "Error al guardar el cliente")
                     }
                 }
             }
@@ -67,108 +87,68 @@ class ClientesViewModel @Inject constructor(
                 rnc = "",
                 email = "",
                 direccion = "",
-                errorMessage = null,
+                nombresError = null,
+                telefonoError = null,
+                celularError = null,
+                rncError = null,
+                emailError = null,
+                direccionError = null,
                 successMessage = null
             )
         }
     }
 
-    fun select(clienteId: Int) {
-        viewModelScope.launch {
-            try {
-                if (clienteId > 0) {
-                    val cliente = clienteRepository.getClienteById(clienteId)
-                    _uiState.update {
-                        it.copy(
-                            clienteId = cliente?.clienteId,
-                            nombres = cliente?.nombres ?: "",
-                            telefono = cliente?.telefono ?: "",
-                            celular = cliente?.celular ?: "",
-                            rnc = cliente?.rnc ?: "",
-                            email = cliente?.email ?: "",
-                            direccion = cliente?.direccion ?: "",
-                            errorMessage = null,
-                            successMessage = null
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(errorMessage = "Error al cargar el cliente", successMessage = null)
-                }
-            }
-        }
-    }
-
-    fun delete(clienteId: Int) {
-        viewModelScope.launch {
-            try {
-                clienteRepository.delete(clienteId)
-                _uiState.update {
-                    it.copy(
-                        successMessage = "Cliente eliminado exitosamente",
-                        errorMessage = null
-                    )
-                }
-                nuevo()
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(errorMessage = "Error al eliminar el cliente", successMessage = null)
-                }
-            }
-        }
-    }
-
-    private fun getClientes() {
-        viewModelScope.launch {
-            try {
-                val clientes = clienteRepository.getClientes()
-                if (clientes.isEmpty()) {
-                    throw EmptyListException("La lista de clientes está vacía")
-                }
-                _uiState.update { it.copy(clientes = clientes) }
-            } catch (e: EmptyListException) {
-                _uiState.update { it.copy(errorMessage = e.message, successMessage = null) }
-            }
-        }
-    }
-
-    class EmptyListException(message: String) : Exception(message)
-
-    // Actualizaciones de UI para cambios en el formulario
     fun onNombresChange(nombres: String) {
         _uiState.update {
-            it.copy(nombres = nombres, errorMessage = null, successMessage = null)
+            it.copy(nombres = nombres, nombresError = null, successMessage = null)
         }
     }
 
     fun onTelefonoChange(telefono: String) {
         _uiState.update {
-            it.copy(telefono = telefono, errorMessage = null, successMessage = null)
+            it.copy(telefono = telefono, telefonoError = null, successMessage = null)
         }
     }
 
     fun onCelularChange(celular: String) {
         _uiState.update {
-            it.copy(celular = celular, errorMessage = null, successMessage = null)
+            it.copy(celular = celular, celularError = null, successMessage = null)
         }
     }
 
     fun onRncChange(rnc: String) {
         _uiState.update {
-            it.copy(rnc = rnc, errorMessage = null, successMessage = null)
+            it.copy(rnc = rnc, rncError = null, successMessage = null)
         }
     }
 
     fun onEmailChange(email: String) {
         _uiState.update {
-            it.copy(email = email, errorMessage = null, successMessage = null)
+            it.copy(email = email, emailError = null, successMessage = null)
+        }
+    }
+    class EmptyListException(message: String) : Exception(message)
+
+    private fun getClientes() {
+        viewModelScope.launch {
+            try{
+                val clientes = clienteRepository.getClientes()
+                if (clientes.isEmpty()) {
+                    throw EmptyListException("No se encontraron clientes")
+                }
+                _uiState.update { it.copy(clientes = clientes) }
+
+            }catch (e: EmptyListException){
+                _uiState.update {
+                    it.copy(errorMessage = e.message, successMessage = null)
+                }
+            }
         }
     }
 
     fun onDireccionChange(direccion: String) {
         _uiState.update {
-            it.copy(direccion = direccion, errorMessage = null, successMessage = null)
+            it.copy(direccion = direccion, direccionError = null, successMessage = null)
         }
     }
 
@@ -180,6 +160,12 @@ class ClientesViewModel @Inject constructor(
         val rnc: String = "",
         val email: String = "",
         val direccion: String = "",
+        val nombresError: String? = null,
+        val telefonoError: String? = null,
+        val celularError: String? = null,
+        val rncError: String? = null,
+        val emailError: String? = null,
+        val direccionError: String? = null,
         val errorMessage: String? = null,
         val successMessage: String? = null,
         val clientes: List<ClienteDto> = emptyList()

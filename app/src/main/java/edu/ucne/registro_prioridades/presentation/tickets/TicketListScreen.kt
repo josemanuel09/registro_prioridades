@@ -1,35 +1,46 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package edu.ucne.registro_prioridades.presentation.ticket
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import edu.ucne.registro_prioridades.data.local.entities.TicketEntity
 import edu.ucne.registro_prioridades.data.remote.dto.TicketDto
 import edu.ucne.registro_prioridades.presentation.tickets.TicketViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun TicketListScreen(
@@ -37,17 +48,15 @@ fun TicketListScreen(
     scope: CoroutineScope,
     viewModel: TicketViewModel = hiltViewModel(),
     createTicket: () -> Unit,
-    onEditTicket: (Int) -> Unit,
-    onDeleteTicket: (Int) -> Unit
+
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     TicketListBodyScreen(
         drawerState = drawerState,
         scope = scope,
         uiState = uiState,
-        createTicket = createTicket,
-        onEditTicket = onEditTicket,
-        onDeleteTicket = onDeleteTicket
+        createTicket = createTicket
+
     )
 }
 
@@ -56,9 +65,8 @@ fun TicketListBodyScreen(
     drawerState: DrawerState,
     scope: CoroutineScope,
     uiState: TicketViewModel.UiState,
-    createTicket: () -> Unit,
-    onEditTicket: (Int) -> Unit,
-    onDeleteTicket: (Int) -> Unit
+    createTicket: () -> Unit
+
 ) {
     Scaffold(
         topBar = {
@@ -108,7 +116,12 @@ fun TicketListBodyScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(uiState.tickets) { ticket ->
-                    TicketRow(ticket, onEditTicket, onDeleteTicket)
+                    TicketRow(
+                        ticket = ticket,
+                        clienteNombre = uiState.clientes.find { it.clienteId == ticket.clienteId }?.nombres ?: "Desconocido",
+                        prioridadNombre = uiState.prioridades.find { it.prioridadId == ticket.prioridadId }?.descripcion ?: "Desconocido",
+                        sistemaNombre = uiState.sistemas.find { it.sistemaId == ticket.sistemaId }?.nombreSistema ?: "Desconocido"
+                    )
                 }
             }
         }
@@ -118,10 +131,11 @@ fun TicketListBodyScreen(
 @Composable
 fun TicketRow(
     ticket: TicketDto,
-    onEditTicket: (Int) -> Unit,
-    onDeleteTicket: (Int) -> Unit
+    clienteNombre: String,
+    prioridadNombre: String,
+    sistemaNombre: String
+
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -143,7 +157,7 @@ fun TicketRow(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "TicketId: ${ticket.ticketId}",
+                    text = "Cliente: $clienteNombre",
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -151,7 +165,21 @@ fun TicketRow(
                     )
                 )
                 Text(
-                    text = "Cliente: ${ticket.clienteId}",
+                    text = "Fecha: ${ticket.fecha}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Text(
+                    text = "Sistema: $sistemaNombre",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Text(
+                    text = "Prioridad: $prioridadNombre",
                     style = TextStyle(
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -164,35 +192,19 @@ fun TicketRow(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 )
-            }
-
-            IconButton(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones")
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Editar") },
-                    leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
-                    onClick = {
-                        expanded = false
-                        onEditTicket(ticket.ticketId!!)
-                    }
+                Text(
+                    text = "Solicitado Por: ${ticket.solicitadoPor}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
                 )
-                DropdownMenuItem(
-                    text = { Text("Eliminar") },
-                    leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
-                    onClick = {
-                        expanded = false
-                        onDeleteTicket(ticket.ticketId!!)
-                    }
+                Text(
+                    text = "Descripcion: ${ticket.descripcion}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
                 )
             }
         }

@@ -35,7 +35,6 @@ fun ClientesScreen(viewModel: ClientesViewModel = hiltViewModel(), goBack: () ->
         onDireccionChange = viewModel::onDireccionChange,
         onSaveCliente = viewModel::save,
         onNuevoCliente = viewModel::nuevo,
-        onSelectCliente = viewModel::select,
         goBack = goBack
     )
 }
@@ -51,7 +50,6 @@ fun ClientesBodyScreen(
     onDireccionChange: (String) -> Unit,
     onSaveCliente: () -> Unit,
     onNuevoCliente: () -> Unit,
-    onSelectCliente: (Int) -> Unit,
     goBack: () -> Unit
 ) {
     Scaffold(
@@ -85,80 +83,102 @@ fun ClientesBodyScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.weight(1f)
-            ) {
-                items(uiState.clientes) { cliente ->
-                    Text(
-                        text = cliente.nombres,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelectCliente(cliente.clienteId!!) }
-                            .padding(8.dp)
-                    )
-                }
-            }
-
-            // Campos de texto para agregar/editar cliente
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Nombres") },
                 value = uiState.nombres,
-                onValueChange = onNombresChange
+                onValueChange = onNombresChange,
+                isError = uiState.nombresError != null
             )
+            uiState.nombresError?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    style = TextStyle(fontSize = 12.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Teléfono") },
                 value = uiState.telefono,
-                onValueChange = onTelefonoChange
+                onValueChange = onTelefonoChange,
+                isError = uiState.telefonoError != null
             )
+            uiState.telefonoError?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    style = TextStyle(fontSize = 12.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Celular") },
                 value = uiState.celular,
-                onValueChange = onCelularChange
+                onValueChange = onCelularChange,
+                isError = uiState.celularError != null
             )
+            uiState.celularError?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    style = TextStyle(fontSize = 12.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "RNC") },
                 value = uiState.rnc,
-                onValueChange = onRncChange
+                onValueChange = onRncChange,
+                isError = uiState.rncError != null
             )
+            uiState.rncError?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    style = TextStyle(fontSize = 12.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Email") },
                 value = uiState.email,
-                onValueChange = onEmailChange
+                onValueChange = onEmailChange,
+                isError = uiState.emailError != null
             )
+            uiState.emailError?.let { error ->
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    style = TextStyle(fontSize = 12.sp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Dirección") },
                 value = uiState.direccion,
-                onValueChange = onDireccionChange
+                onValueChange = onDireccionChange,
+                isError = uiState.direccionError != null
             )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Mensaje de error
-            uiState.errorMessage?.let { message ->
+            uiState.direccionError?.let { error ->
                 Text(
-                    text = message,
+                    text = error,
                     color = Color.Red,
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    style = TextStyle(fontSize = 12.sp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
             }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Botones para guardar o crear un nuevo cliente
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
